@@ -1,0 +1,47 @@
+class Solution {
+public:
+    void part_heap_sort(vector<int>&data,int index,int size){
+        int left=index*2+1,right=index*+2,maxin=index;
+        if(left<size&&data[left]>data[index]) maxin=left;
+        if(right<size&&data[right]>data[maxin]) maxin=right;
+        if(maxin!=index){
+            swap(data[maxin],data[index]);
+            part_heap_sort(data,maxin,size);
+        }
+        return ;
+    }
+    void heap_sort(vector<int>&data){
+        for(int i=data.size()/2-1;i>=0;--i){
+            part_heap_sort(data,i,data.size());
+        }
+        for(int i=data.size()-1;i>0;--i){
+            swap(data[i],data[0]);
+            part_heap_sort(data,0,i);
+        }
+        return ;
+    }
+    int threeSumClosest(vector<int>& nums, int target) {
+        heap_sort(nums);
+        int res=INT_MAX;
+        int pos1,pos2,pos3;
+        int left,right,i;
+        for(i=nums.size()-1;i>=2;--i){
+            left=0,right=i-1;
+            while(left<right){
+                int diff=nums[left]+nums[right]+nums[i]-target;
+                if(abs(diff)<res){
+                    res=abs(diff);
+                    pos1=nums[left];
+                    pos2=nums[right];
+                    pos3=nums[i];
+                }
+                if(diff==0) return nums[left]+nums[right]+nums[i];
+                if(diff>0)
+                    --right;
+                if(diff<0)
+                    ++left;
+            }
+        }
+        return pos1+pos2+pos3;
+    }
+};
