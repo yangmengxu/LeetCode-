@@ -1,0 +1,68 @@
+对于普通的随机数组，我们可以利用归并排序在O（nlogn）的情况下完成逆序对的计算
+但是对于  
+ 给出一个长度为2^n的序列，m次操作，每次操作给出一整数q，把该序列分成连续的长度均为2^q的2^(n-q)段后，把每段反转，并查询反转后的逆序对 
+ 
+ 解题思路：
+ 考虑归并排序求逆序对的过程，对于一个反转2^q子段的操作，反转后每段的逆序对数变成反转前的顺序对数，且段与段之间的逆序对数并没有改变，
+ 故在归并排序过程中统计每层产生的逆序对数和顺序对数，对于一个操作q，把所有长度不超过2^q的层产生逆序对数和顺序对数交换，更长的段保持不变，
+ 统计每层的逆序对数即为该次查询的答案 
+ 
+#include<cstdio>
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<cmath>
+#include<vector>
+#include<queue>
+#include<map>
+#include<set>
+#include<ctime>
+using namespace std;
+typedef long long ll;
+#define INF 0x3f3f3f3f
+#define maxn 1111111
+ll cnt[22][2];//cnt[i][0]表示归并排序中长度为2^i的子段产生的逆序对,cnt[i][1]表示顺序对 
+int n,a[maxn],b[maxn],m,q;
+void Merge_Sort(int l,int r,int len)
+{
+    if(l>=r)return ;
+    int mid=(l+r)/2;
+    Merge_Sort(l,mid,len-1),Merge_Sort(mid+1,r,len-1);
+    int i=l,j=mid+1,res=0;
+    while(i<=mid&&j<=r)
+    {
+        if(a[i]<a[j])cnt[len][1]+=r-j+1,i++;
+        else j++;
+    } 
+    i=l,j=mid+1;
+    while(i<=mid&&j<=r)
+    {
+        if(a[i]>a[j])cnt[len][0]+=mid-i+1,b[res++]=a[j++];
+        else b[res++]=a[i++];
+    }
+    while(i<=mid)b[res++]=a[i++];
+    while(j<=r)b[res++]=a[j++];
+    for(int i=l;i<=r;i++)a[i]=b[i-l];
+}
+int main()
+{
+    while(~scanf("%d",&n))
+    {
+        memset(cnt,0,sizeof(cnt));
+        for(int i=1;i<=(1<<n);i++)scanf("%d",&a[i]);
+        Merge_Sort(1,1<<n,n);
+        scanf("%d",&m);
+        while(m--)
+        {
+            scanf("%d",&q);
+            ll ans=0;
+            for(int i=1;i<=n;i++)
+            {
+                if(i<=q)swap(cnt[i][0],cnt[i][1]);
+                ans+=cnt[i][0];
+            }
+            printf("%I64d\n",ans);
+        }
+    }
+    return 0;
+}
